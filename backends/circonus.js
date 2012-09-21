@@ -1,5 +1,8 @@
 /*
- * Flush stats to circonus
+ * Copyright (c) 2010 Etsy
+ * Copyright (c) 2012 Zimride
+ *
+ * Flush stats to circonus (based on the graphite backend).
  *
  * To enable this backend, include 'circonus' in the backends
  * configuration array:
