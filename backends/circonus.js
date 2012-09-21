@@ -17,49 +17,55 @@ var https = require('https'),
 
 var debug;
 var flushInterval;
-
 var circonusHttpTrapUrl;
+
 var circonusStats = {};
 
 var post_stats = function circonus_post_stats(payload) {
-  payload = JSON.stringify(payload);
-  var last_flush = circonusStats.last_flush || 0;
-  var last_exception = circonusStats.last_exception || 0;
-
-  var parsed_host = url_parse(circonusHttpTrapUrl);
-
-  if (debug) {
-      util.log('Parsed Host: ' + JSON.stringify(parsed_host) + "\n");
-  }
-  var options = {
-      host: parsed_host["hostname"],
-      port: parsed_host["port"] || 443,
-      path: parsed_host["pathname"],
-      method: 'PUT',
-      headers: {
+  if (circonusHttpTrapUrl) {
+    try {
+      payload = JSON.stringify(payload);
+      var parsed_host = url_parse(circonusHttpTrapUrl);
+      if (debug) {
+        util.log('Parsed circonus host: ' + JSON.stringify(parsed_host));
+      }
+      var options = {
+        host: parsed_host["hostname"],
+        port: parsed_host["port"] || 443,
+        path: parsed_host["pathname"],
+        method: 'PUT',
+        headers: {
           "Content-Type": "application/json",
           "User-Agent" : "StatsdCirconusBackend/1",
           "Content-Length": payload.length
-      }
-  };
-  var req = https.request(options, function(res) {
-      if (debug) {
-          util.log('RES STATUS: ' + res.statusCode);
-          util.log('RES HEADERS: ' + JSON.stringify(res.headers));
+        }
+      };
+      var req = https.request(options, function(res) {
+        if (debug) {
+          util.log('Circonus response status: ' + res.statusCode);
+          util.log('Circonus response headers: ' + JSON.stringify(res.headers));
           res.setEncoding('utf8');
           res.on('data', function (chunk) {
-              util.log('RES BODY: ' + chunk);
+            util.log('Circonus response body: ' + chunk);
           });
+        }
+      });
+      req.on('error', function(e) {
+        util.log('Error making circonus request: ' + e.message);
+      });
+      if (debug) {
+        util.log('Circonus request body: ' + payload);
       }
-  });
-  req.on('error', function(e) {
-      util.log('problem with request: ' + e.message);
-  });
-  util.log('Request Body: ' + payload + '\n');
-  req.write(payload);
-  req.end();
-  circonusStats.last_flush = Math.round(new Date().getTime() / 1000);
-  circonusStats.last_exception = Math.round(new Date().getTime() / 1000);
+      req.write(payload);
+      req.end();
+      circonusStats.last_flush = Math.round(new Date().getTime() / 1000);
+    } catch(e){
+      if (debug) {
+        util.log('Exception sending stats to circonus: ' + e);
+      }
+      circonusStats.last_exception = Math.round(new Date().getTime() / 1000);
+    }
+  }
 }
 
 var flush_stats = function circonus_flush(ts, metrics) {
