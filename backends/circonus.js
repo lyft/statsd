@@ -22,6 +22,7 @@ var circonusHttpTrapUrl;
 var circonusStats = {};
 
 var post_stats = function circonus_post_stats(payload) {
+  payload = JSON.stringify(payload);
   var last_flush = circonusStats.last_flush || 0;
   var last_exception = circonusStats.last_exception || 0;
 
@@ -37,7 +38,8 @@ var post_stats = function circonus_post_stats(payload) {
       method: 'PUT',
       headers: {
           "Content-Type": "application/json",
-          "User-Agent" : "StatsdCirconusBackend/1"
+          "User-Agent" : "StatsdCirconusBackend/1",
+          "Content-Length": payload.length
       }
   };
   var req = https.request(options, function(res) {
@@ -53,7 +55,6 @@ var post_stats = function circonus_post_stats(payload) {
   req.on('error', function(e) {
       util.log('problem with request: ' + e.message);
   });
-  payload = JSON.stringify(payload);
   util.log('Request Body: ' + payload + '\n');
   req.write(payload);
   req.end();
