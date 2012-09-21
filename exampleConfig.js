@@ -49,15 +49,11 @@ Optional Variables:
                     packets should be "repeated" (duplicated to).
                     e.g. [ { host: '10.10.10.10', port: 8125 },
                            { host: 'observer', port: 88125 } ]
- backends: ["./backends/console", "statsd-librato-backend"]
- librato: {
-    email: "mathias@zimride.com",
-    token: "",
-  }
 */
 {
-  debug: true
+  graphitePort: 2003
+, graphiteHost: "graphite.host.com"
 , port: 8125
-, backends: ["./backends/console", "./backends/circonus"]
-, circonusHttpTrapUrl: "https://trap.noit.circonus.net/module/httptrap/bcc081da-f4e3-4424-abf3-c3b81d8673eb/mys3cr3t"
+, backends: [ "./backends/repeater" ]
+, repeater: [ { host: "10.8.3.214", port: 8125 } ]
 }
