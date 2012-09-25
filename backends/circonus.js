@@ -89,12 +89,11 @@ var flush_stats = function circonus_flush(ts, metrics) {
   for (key in counters) {
     var value = counters[key];
     if (!circonusCounters[key]) {
-      circonusCounters[key] = {value: value, lastUpdate: ts};
+      circonusCounters[key] = value;
     } else {
-      circonusCounters[key].value += value;
-      circonusCounters[key].lastUpdate = ts;
+      circonusCounters[key] += value;
     }
-    stats[key + '.counter'] = circonusCounters[key].value;
+    stats[key + '.counter'] = circonusCounters[key];
     numStats += 1;
   }
 
