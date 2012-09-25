@@ -24,6 +24,9 @@ var circonusHttpTrapUrl;
 
 var circonusStats = {};
 
+// Statsd counters reset, we want monotonically increasing counters.
+var circonusCounters = {};
+
 var post_stats = function circonus_post_stats(payload) {
   if (circonusHttpTrapUrl) {
     try {
@@ -85,11 +88,13 @@ var flush_stats = function circonus_flush(ts, metrics) {
 
   for (key in counters) {
     var value = counters[key];
-    var valuePerSecond = value / (flushInterval / 1000); // calculate "per second" rate
-
-    stats[key + '.counter.rate'] = valuePerSecond;
-    stats[key + '.counter.counts'] = value;
-
+    if (!circonusCounters[key]) {
+      circonusCounters[key] = {value: value, lastUpdate: ts};
+    } else {
+      circonusCounters[key].value += value;
+      circonusCounters[key].lastUpdate = ts;
+    }
+    stats[key + '.counter'] = circonusCounters[key].value;
     numStats += 1;
   }
 
