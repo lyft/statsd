@@ -18,6 +18,8 @@ var https = require('https'),
     util = require('util'),
     url_parse = require('url').parse;
 
+var fs = require('fs');
+
 var debug;
 var flushInterval;
 var circonusHttpTrapUrl;
@@ -40,6 +42,7 @@ var post_stats = function circonus_post_stats(payload) {
         port: parsed_host["port"] || 443,
         path: parsed_host["pathname"],
         method: 'PUT',
+        ca: [ fs.readFileSync('/etc/ssl/certs/ca-certificates.crt') ],
         headers: {
           "Content-Type": "application/json",
           "User-Agent" : "StatsdCirconusBackend/1",
