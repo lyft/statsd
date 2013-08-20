@@ -42,7 +42,7 @@ var post_stats = function circonus_post_stats(payload) {
         port: parsed_host["port"] || 443,
         path: parsed_host["pathname"],
         method: 'PUT',
-        ca: [ fs.readFileSync('/etc/ssl/certs/ca-certificates.crt') ],
+        ca: [ fs.readFileSync('/usr/local/share/ca-certificates/circonus_CA.crt') ],
         headers: {
           "Content-Type": "application/json",
           "User-Agent" : "StatsdCirconusBackend/1",
