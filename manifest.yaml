@@ -1,0 +1,16 @@
+name: statsd
+description: Simple daemon for easy stats aggregation
+repository: git@github.com:lyft/statsd.git
+containers:
+  - name: legacy
+    command: /code/containers/legacy/entrypoint.sh
+    exports:
+      - name: api
+        port: 8125
+
+groups:
+  - name: dev
+    members:
+      - control.default
+      - TODO dev dependencies (can be dynamodb.server, redis.server, etc)
+      - statsd.legacy

@@ -1,0 +1,3 @@
+base:
+  '*':
+    - orca.ecr
